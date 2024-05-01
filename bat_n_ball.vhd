@@ -21,7 +21,7 @@ ENTITY bat_n_ball IS
 END bat_n_ball;
 
 ARCHITECTURE Behavioral OF bat_n_ball IS
-    CONSTANT bsize : INTEGER := 8; -- ball size in pixels
+    CONSTANT bsize : INTEGER := 400; -- ball size in pixels
     SIGNAL bat_w : INTEGER := 40; -- bat width in pixels
     CONSTANT bat_h : INTEGER := 3; -- bat height in pixels
     -- distance ball moves each frame
