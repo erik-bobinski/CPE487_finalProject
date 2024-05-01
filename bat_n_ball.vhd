@@ -139,7 +139,6 @@ BEGIN
                 hits <= hit_counter;
                 --hits <="0000000000111111";
                 ball_y_motion <= (NOT ball_speed) + 1; -- set vspeed to (- ball_speed) pixels
-                END IF;
                 
         END IF;
         -- compute next ball vertical position
