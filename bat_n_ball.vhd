@@ -38,6 +38,8 @@ ARCHITECTURE Behavioral OF bat_n_ball IS
     
     SIGNAL hit_counter : STD_LOGIC_VECTOR(15 DOWNTO 0);
     SIGNAL checker : STD_LOGIC := '0'; --force to wait until ball bounce
+
+    SIGNAL last_contact_y: STD_LOGIC_VECTOR(10 DOWNTO 0) := CONV_STD_LOGIC_VECTOR(300, 11);
 BEGIN
     red <= NOT bat_on; -- color setup for red ball and cyan bat on white background
     green <= NOT ball_on;
@@ -114,7 +116,7 @@ BEGIN
             hit_counter <= "0000000000000001";
             hits <= hit_counter;
             checker <= '0';
-        ELSIF ball_y <= bsize THEN -- bounce off top wall
+        ELSIF ball_y <= last_contact_y - 250 THEN -- bounce off top wall (in our case it bounces once it reaches peak height which is 250px above last contact point)
             ball_y_motion <= ball_speed; -- set vspeed to (+ ball_speed) pixels
             checker <= '0';
         ELSIF ball_y + bsize >= 600 THEN -- if ball meets bottom wall
@@ -131,13 +133,12 @@ BEGIN
          (ball_x - bsize/2) <= (bat_x + bat_w) AND
              (ball_y + bsize/2) >= (bat_y - bat_h) AND
              (ball_y - bsize/2) <= (bat_y + bat_h) AND checker = '0' THEN
+                last_contact_y <= ball_y;
                 checker <= '1';
                 hit_counter <= hit_counter + 1;
                 hits <= hit_counter;
                 --hits <="0000000000111111";
                 ball_y_motion <= (NOT ball_speed) + 1; -- set vspeed to (- ball_speed) pixels
-                IF bat_w > 1 THEN
-                    bat_w <= bat_w-1;
                 END IF;
                 
         END IF;
