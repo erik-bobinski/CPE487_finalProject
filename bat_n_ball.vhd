@@ -89,11 +89,18 @@ BEGIN
 
     mplatform : PROCESS
     BEGIN
+        -- process to move bat from right to left side of screen
+        temp := ('0' & bat_x) + (bat_motion(10) & bat_motion);
+        IF game_on = '0' THEN
+            bat_x <= CONV_STD_LOGIC_VECTOR(800, 11);
+        ELSIF temp(11) = '1' THEN
+            bat_x <= (OTHERS => '0');
+        ELSE bat_x <= temp(10 DOWNTO 0); -- 9 downto 0
+        END IF;
+        
         -- respawn on right side once it reaches left side
         IF bat_x <= 0 THEN
             bat_x <= CONV_STD_LOGIC_VECTOR(800, 11);
-        ELSE
-            bat_x <= bat_x - bat_motion;
         END IF;
     END PROCESS;
 
