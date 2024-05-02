@@ -90,6 +90,7 @@ BEGIN
     mplatform : PROCESS
         VARIABLE temp : STD_LOGIC_VECTOR (11 DOWNTO 0);
     BEGIN
+        WAIT UNTIL rising_edge(v_sync);
         -- process to move bat from right to left side of screen
         temp := ('0' & bat_x) + (bat_motion(10) & bat_motion);
         IF game_on = '0' OR bat_x <= 0 THEN
