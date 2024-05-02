@@ -9,7 +9,6 @@ ENTITY bat_n_ball IS
         v_sync : IN STD_LOGIC;
         pixel_row : IN STD_LOGIC_VECTOR(10 DOWNTO 0);
         pixel_col : IN STD_LOGIC_VECTOR(10 DOWNTO 0);
-        bat_x : IN STD_LOGIC_VECTOR (10 DOWNTO 0); -- current bat x position
         ball_x : IN STD_LOGIC_VECTOR (10 DOWNTO 0); -- current ball x position
         serve : IN STD_LOGIC; -- initiates serve
         SW: IN STD_LOGIC_VECTOR (4 DOWNTO 0); -- Switches
@@ -21,20 +20,26 @@ ENTITY bat_n_ball IS
 END bat_n_ball;
 
 ARCHITECTURE Behavioral OF bat_n_ball IS
-    CONSTANT bsize : INTEGER := 400; -- ball size in pixels
-    SIGNAL bat_w : INTEGER := 40; -- bat width in pixels
-    CONSTANT bat_h : INTEGER := 3; -- bat height in pixels
+    CONSTANT bsize : INTEGER := 8; -- ball size in pixels
+    SIGNAL bat_x : STD_LOGIC_VECTOR(10 DOWNTO 0) := CONV_STD_LOGIC_VECTOR(800, 11); -- start on far right of screen
+    SIGNAL bat_w : INTEGER := 400; -- bat width in pixels
+    CONSTANT bat_h : INTEGER := 5; -- bat height in pixels
     -- distance ball moves each frame
-    SIGNAL ball_speed : STD_LOGIC_VECTOR (10 DOWNTO 0) := CONV_STD_LOGIC_VECTOR (8, 11); 
+    SIGNAL ball_speed : STD_LOGIC_VECTOR (10 DOWNTO 0) := CONV_STD_LOGIC_VECTOR (28, 11); 
+    -- distance bat moves each frame
+    SIGNAL bat_speed : STD_LOGIC_VECTOR (10 DOWNTO 0) := CONV_STD_LOGIC_VECTOR (40, 11); 
+    
     SIGNAL ball_on : STD_LOGIC; -- indicates whether ball is at current pixel position
     SIGNAL bat_on : STD_LOGIC; -- indicates whether bat at over current pixel position
     SIGNAL game_on : STD_LOGIC := '0'; -- indicates whether ball is in play
     -- current ball position - intitialized to center of screen
-    SIGNAL ball_y : STD_LOGIC_VECTOR(10 DOWNTO 0) := CONV_STD_LOGIC_VECTOR(300, 11);
+    SIGNAL ball_y : STD_LOGIC_VECTOR(10 DOWNTO 0) := CONV_STD_LOGIC_VECTOR(350, 11);
     -- bat vertical position
     CONSTANT bat_y : STD_LOGIC_VECTOR(10 DOWNTO 0) := CONV_STD_LOGIC_VECTOR(500, 11);
     -- current ball motion - initialized to (+ ball_speed) pixels/frame in both X and Y directions
     SIGNAL ball_y_motion : STD_LOGIC_VECTOR(10 DOWNTO 0) := ball_speed;
+    -- current bat motion - initialized to (+ bat_speed) pixels/frame in X direction
+    SIGNAL bat_motion : STD_LOGIC_VECTOR(10 DOWNTO 0) := bat_speed;
     
     SIGNAL hit_counter : STD_LOGIC_VECTOR(15 DOWNTO 0);
     SIGNAL checker : STD_LOGIC := '0'; --force to wait until ball bounce
@@ -82,6 +87,16 @@ BEGIN
 
     END PROCESS;
 
+    mplatform : PROCESS
+    BEGIN
+        -- respawn on right side once it reaches left side
+        IF bat_x <= 0 THEN
+            bat_x <= CONV_STD_LOGIC_VECTOR(800, 11);
+        ELSE
+            bat_x <= bat_x - bat_motion;
+        END IF;
+    END PROCESS;
+
     -- process to move ball once every frame (i.e., once every vsync pulse)
     mball : PROCESS
         VARIABLE temp : STD_LOGIC_VECTOR (11 DOWNTO 0);
@@ -112,7 +127,6 @@ BEGIN
         IF serve = '1' AND game_on = '0' THEN -- test for new serve
             game_on <= '1';
             ball_y_motion <= (NOT ball_speed) + 1; -- set vspeed to (- ball_speed) pixels
-            bat_w <= 40;
             hit_counter <= "0000000000000001";
             hits <= hit_counter;
             checker <= '0';
@@ -139,6 +153,7 @@ BEGIN
                 hits <= hit_counter;
                 --hits <="0000000000111111";
                 ball_y_motion <= (NOT ball_speed) + 1; -- set vspeed to (- ball_speed) pixels
+                
                 
         END IF;
         -- compute next ball vertical position
