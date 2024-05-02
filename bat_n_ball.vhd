@@ -22,12 +22,12 @@ END bat_n_ball;
 ARCHITECTURE Behavioral OF bat_n_ball IS
     CONSTANT bsize : INTEGER := 8; -- ball size in pixels
     SIGNAL bat_x : STD_LOGIC_VECTOR(10 DOWNTO 0) := CONV_STD_LOGIC_VECTOR(800, 11); -- start on far right of screen
-    SIGNAL bat_w : INTEGER := 400; -- bat width in pixels
-    CONSTANT bat_h : INTEGER := 5; -- bat height in pixels
+    SIGNAL bat_w : INTEGER := 50; -- bat width in pixels
+    CONSTANT bat_h : INTEGER := 10; -- bat height in pixels
     -- distance ball moves each frame
     SIGNAL ball_speed : STD_LOGIC_VECTOR (10 DOWNTO 0) := CONV_STD_LOGIC_VECTOR (28, 11); 
     -- distance bat moves each frame
-    SIGNAL bat_speed : STD_LOGIC_VECTOR (10 DOWNTO 0) := CONV_STD_LOGIC_VECTOR (40, 11); 
+    SIGNAL bat_speed : STD_LOGIC_VECTOR (10 DOWNTO 0) := CONV_STD_LOGIC_VECTOR (15, 11); 
     
     SIGNAL ball_on : STD_LOGIC; -- indicates whether ball is at current pixel position
     SIGNAL bat_on : STD_LOGIC; -- indicates whether bat at over current pixel position
@@ -35,7 +35,7 @@ ARCHITECTURE Behavioral OF bat_n_ball IS
     -- current ball position - intitialized to center of screen
     SIGNAL ball_y : STD_LOGIC_VECTOR(10 DOWNTO 0) := CONV_STD_LOGIC_VECTOR(350, 11);
     -- bat vertical position
-    CONSTANT bat_y : STD_LOGIC_VECTOR(10 DOWNTO 0) := CONV_STD_LOGIC_VECTOR(500, 11);
+    SIGNAL bat_y : STD_LOGIC_VECTOR(10 DOWNTO 0) := CONV_STD_LOGIC_VECTOR(500, 11);
     -- current ball motion - initialized to (+ ball_speed) pixels/frame in both X and Y directions
     SIGNAL ball_y_motion : STD_LOGIC_VECTOR(10 DOWNTO 0) := ball_speed;
     -- current bat motion - initialized to (+ bat_speed) pixels/frame in X direction
@@ -44,7 +44,11 @@ ARCHITECTURE Behavioral OF bat_n_ball IS
     SIGNAL hit_counter : STD_LOGIC_VECTOR(15 DOWNTO 0);
     SIGNAL checker : STD_LOGIC := '0'; --force to wait until ball bounce
 
+    -- keep track of last y conteact so they can't counce too high
     SIGNAL last_contact_y: STD_LOGIC_VECTOR(10 DOWNTO 0) := CONV_STD_LOGIC_VECTOR(300, 11);
+
+    -- randomizer for platform
+    SIGNAL rand_platform_y : STD_LOGIC_VECTOR(10 downto 0);
 BEGIN
     red <= NOT bat_on; -- color setup for red ball and cyan bat on white background
     green <= NOT ball_on;
@@ -89,15 +93,15 @@ BEGIN
 
     mplatform : PROCESS
         VARIABLE temp : STD_LOGIC_VECTOR (11 DOWNTO 0);
+        VARIABLE temp2 : STD_LOGIC_VECTOR (11 DOWNTO 0);
     BEGIN
         WAIT UNTIL rising_edge(v_sync);
-        -- process to move bat from right to left side of screen
-        temp := ('0' & bat_x) + (bat_motion(10) & bat_motion);
-        IF game_on = '0' OR bat_x <= 0 THEN
+        -- process to move bat from left to right side of screen
+        if game_on = '0' OR bat_x < 25 THEN
             bat_x <= CONV_STD_LOGIC_VECTOR(800, 11);
-        ELSIF temp(11) = '1' THEN
-            bat_x <= (OTHERS => '0');
-        ELSE bat_x <= temp(10 DOWNTO 0); -- 9 downto 0
+            bat_y <= rand_platform_y;
+        ELSE
+            bat_x <= bat_x - bat_motion;
         END IF;
     END PROCESS;
 
@@ -158,7 +162,6 @@ BEGIN
                 --hits <="0000000000111111";
                 ball_y_motion <= (NOT ball_speed) + 1; -- set vspeed to (- ball_speed) pixels
                 
-                
         END IF;
         -- compute next ball vertical position
         -- variable temp adds one more bit to calculation to fix unsigned underflow problems
@@ -171,4 +174,15 @@ BEGIN
         ELSE ball_y <= temp(10 DOWNTO 0); -- 9 downto 0
         END IF;
     END PROCESS;
-END Behavioral;
+
+    -- TODO: FIX this randomizer
+    randomizer: PROCESS IS
+        VARIABLE rand : INTEGER;        
+    BEGIN
+        WAIT UNTIL (falling_edge(v_sync));
+        -- may need to include an actual counter variable to make it more random actually change
+        -- not including bat_x bc it only ever resets once ball_x is at 800 (i think that's how it works?)
+        rand := (conv_integer(pixel_row XOR pixel_col XOR ball_y XOR ball_x) mod 250) + 325; -- random number between 325 and 575
+        rand_platform_y <= conv_std_logic_vector(rand,11);
+    END PROCESS;
+END Behavioral; 
