@@ -126,7 +126,7 @@ BEGIN
         -- process to move bat from left to right side of screen
         if game_on = '0' OR bat_x < 25 THEN
             bat_x <= CONV_STD_LOGIC_VECTOR(800, 11);
-            bat_y <= rand_platform_y;
+            bat_y <= conv_std_logic_vector((conv_integer(rand_platform_y)*7)mod 250 + 325,11);
         ELSE
             bat_x <= bat_x - bat_motion;
         END IF;
@@ -137,7 +137,7 @@ BEGIN
         WAIT UNTIL rising_edge(v_sync);
         if game_on = '0' OR bat_x1 < 25 THEN
             bat_x1 <= CONV_STD_LOGIC_VECTOR(750, 11);
-            bat_y1 <= rand_platform_y+20;
+            bat_y1 <= conv_std_logic_vector((conv_integer(rand_platform_y)*41)mod 250 + 325,11);
         ELSE
             bat_x1 <= bat_x1 - bat_motion;
         END IF;
@@ -148,7 +148,7 @@ BEGIN
         WAIT UNTIL rising_edge(v_sync);
         if game_on = '0' OR bat_x2 < 25 THEN
             bat_x2 <= CONV_STD_LOGIC_VECTOR(600, 11);
-            bat_y2 <= rand_platform_y - 20;
+            bat_y2 <= conv_std_logic_vector((conv_integer(rand_platform_y)*29)mod 250 + 325,11);
         ELSE
             bat_x2 <= bat_x2 - bat_motion;
         END IF;
