@@ -52,11 +52,12 @@ ARCHITECTURE Behavioral OF bat_n_ball IS
     SIGNAL hit_counter : STD_LOGIC_VECTOR(15 DOWNTO 0);
     SIGNAL checker : STD_LOGIC := '0'; --force to wait until ball bounce
 
-    -- keep track of last y conteact so they can't counce too high
+    -- keep track of last y contact so they can't counce too high
     SIGNAL last_contact_y: STD_LOGIC_VECTOR(10 DOWNTO 0) := CONV_STD_LOGIC_VECTOR(300, 11);
 
     -- randomizer for platform
     SIGNAL rand_platform_y : STD_LOGIC_VECTOR(10 downto 0);
+    SIGNAL rand_clock : STD_LOGIC_VECTOR(10 downto 0); -- a clock that increments every clock cycle to assist RNG
 BEGIN
     red <= bat_on OR bat_on1 OR bat_on2; -- color setup for red ball and cyan bat on white background
     green <= ball_on;
@@ -125,7 +126,7 @@ BEGIN
         -- process to move bat from left to right side of screen
         if game_on = '0' OR bat_x < 25 THEN
             bat_x <= CONV_STD_LOGIC_VECTOR(800, 11);
-            bat_y <= rand_platform_y;
+            bat_y <= conv_std_logic_vector((conv_integer(rand_platform_y)*7)mod 250 + 325,11);
         ELSE
             bat_x <= bat_x - bat_motion;
         END IF;
@@ -136,7 +137,7 @@ BEGIN
         WAIT UNTIL rising_edge(v_sync);
         if game_on = '0' OR bat_x1 < 25 THEN
             bat_x1 <= CONV_STD_LOGIC_VECTOR(750, 11);
-            bat_y1 <= rand_platform_y+20;
+            bat_y1 <= conv_std_logic_vector((conv_integer(rand_platform_y)*41)mod 250 + 325,11);
         ELSE
             bat_x1 <= bat_x1 - bat_motion;
         END IF;
@@ -147,7 +148,7 @@ BEGIN
         WAIT UNTIL rising_edge(v_sync);
         if game_on = '0' OR bat_x2 < 25 THEN
             bat_x2 <= CONV_STD_LOGIC_VECTOR(600, 11);
-            bat_y2 <= rand_platform_y - 20;
+            bat_y2 <= conv_std_logic_vector((conv_integer(rand_platform_y)*29)mod 250 + 325,11);
         ELSE
             bat_x2 <= bat_x2 - bat_motion;
         END IF;
@@ -215,7 +216,7 @@ BEGIN
         END IF;
         -- compute next ball vertical position
         -- variable temp adds one more bit to calculation to fix unsigned underflow problems
-        -- when ball_y is close to zero and ball_y_motion is negative
+        -- when ball_y is close toand  zero ball_y_motion is negative
         temp := ('0' & ball_y) + (ball_y_motion(10) & ball_y_motion);
         IF game_on = '0' THEN
             ball_y <= CONV_STD_LOGIC_VECTOR(250, 11);
@@ -225,14 +226,24 @@ BEGIN
         END IF;
     END PROCESS;
 
+    -- create a function to generate random values
+    -- FUNCTION Random_Int (Min, Max: INTEGER) RETURN INTEGER IS
+    -- BEGIN
+    --     RETURN Min + TRUNC((Max - Min + 1) * RANDOM);
+    -- END FUNCTION Random_Int;
+    
+    
     -- TODO: FIX this randomizer
     randomizer: PROCESS IS
-        VARIABLE rand : INTEGER;        
-    BEGIN
+        VARIABLE rand : INTEGER;      
+        BEGIN
         WAIT UNTIL (falling_edge(v_sync));
+        rand_clock <= rand_clock + 10; -- increment clock every clock cycle(not sure if a certain increment value would best for max variation)
         -- may need to include an actual counter variable to make it more random actually change
         -- not including bat_x bc it only ever resets once ball_x is at 800 (i think that's how it works?)
-        rand := (conv_integer(pixel_row XOR pixel_col XOR ball_y XOR ball_x) mod 250) + 325; -- random number between 325 and 575
-        rand_platform_y <= conv_std_logic_vector(rand,11);
+        if game_on = '1' then -- only apply randomness to the platforms' y-pos when the game is active; sometimes causes issue where a bat spawns at upper-right of screen
+            rand := (conv_integer(pixel_row XOR pixel_col XOR ball_y XOR ball_x XOR hit_counter(10 downto 0) XOR rand_clock) mod 250) + 325; -- random number between 325 and 575
+            rand_platform_y <= conv_std_logic_vector(rand,11);
+        end if;
     END PROCESS;
 END Behavioral; 
