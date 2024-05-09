@@ -29,9 +29,9 @@ ARCHITECTURE Behavioral OF bat_n_ball IS
     CONSTANT bat_h : INTEGER := 10; -- bat height in pixels
     SIGNAL bat_w : INTEGER := 50; -- bat width in pixels
 
-    SIGNAL bat_x : STD_LOGIC_VECTOR(10 DOWNTO 0) := CONV_STD_LOGIC_VECTOR(850, 11); -- start on far right of screen
-    SIGNAL bat_x1 : STD_LOGIC_VECTOR(10 DOWNTO 0) := CONV_STD_LOGIC_VECTOR(900, 11); -- start on far right of screen
-    SIGNAL bat_x2 : STD_LOGIC_VECTOR(10 DOWNTO 0) := CONV_STD_LOGIC_VECTOR(800, 11); -- start on far right of screen
+    SIGNAL bat_x : STD_LOGIC_VECTOR(10 DOWNTO 0) := CONV_STD_LOGIC_VECTOR(850, 11); -- start on far right of screen offest from others
+    SIGNAL bat_x1 : STD_LOGIC_VECTOR(10 DOWNTO 0) := CONV_STD_LOGIC_VECTOR(900, 11); -- start on far right of screen offest from others
+    SIGNAL bat_x2 : STD_LOGIC_VECTOR(10 DOWNTO 0) := CONV_STD_LOGIC_VECTOR(800, 11); -- start on far right of screen offset from others
 
     -- distance ball moves each frame
     SIGNAL ball_speed : STD_LOGIC_VECTOR (10 DOWNTO 0) := CONV_STD_LOGIC_VECTOR(initial_ball_speed, 11); 
@@ -68,7 +68,7 @@ ARCHITECTURE Behavioral OF bat_n_ball IS
     -- timer for game
     signal timer_on : std_logic;
     signal counter_reg : std_logic_vector(29 downto 0);
-    signal seconds_one : std_logic_vector(3 downto 0) := (others => '0');  -- Initialize to zero
+    signal seconds_one : std_logic_vector(3 downto 0) := (others => '0');
     signal seconds_ten : std_logic_vector(3 downto 0) := (others => '0');
     signal seconds_hun : std_logic_vector(3 downto 0) := (others => '0');
     signal seconds_tho : std_logic_vector(3 downto 0) := (others => '0');
@@ -88,7 +88,7 @@ BEGIN
                     if seconds_one = "1001" then  -- Reset seconds after reaching 9 (4-bit limit)
                         seconds_one <= (others => '0');
                         seconds_ten <= seconds_ten + "0001";
-                        -- increase bat speed by 4  speed every 10 seconds
+                        -- increase bat speed by 4  speed every 10 seconds, caps at 40
                         if bat_speed < 40 then
                             bat_speed <= bat_speed + 4;
                         end if;
@@ -104,7 +104,7 @@ BEGIN
                 else
                     counter_reg <= counter_reg + 1;
                 end if;
-                -- Output current time
+                -- Update to represent current time, display will show it
                 current_time <= seconds_tho & seconds_hun & seconds_ten & seconds_one;
             end if;
         end if;
@@ -242,6 +242,9 @@ BEGIN
             seconds_ten <= (others => '0');
             seconds_hun <= (others => '0');
             seconds_tho <= (others => '0');
+            -- reset ball starting position
+            ball_y <= CONV_STD_LOGIC_VECTOR(200, 11);
+            ball_x <= CONV_STD_LOGIC_VECTOR(400, 11);
 
             bat_speed <= CONV_STD_LOGIC_VECTOR(initial_bat_speed, 11); -- rest bat speed
             timer_on <= '1'; -- turn timer back on
