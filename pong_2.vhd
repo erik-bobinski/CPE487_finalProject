@@ -14,7 +14,7 @@ ENTITY pong IS
         btnl : IN STD_LOGIC;
         btnr : IN STD_LOGIC;
         btn0 : IN STD_LOGIC;
-        SW : IN STD_LOGIC_VECTOR (4 DOWNTO 0); -- FIXME: getting speed from switches
+        SW : IN STD_LOGIC_VECTOR (3 DOWNTO 0); -- getting speed from switches
         SEG7_anode : OUT STD_LOGIC_VECTOR (7 DOWNTO 0); -- anodes of four 7-seg displays
         SEG7_seg : OUT STD_LOGIC_VECTOR (6 DOWNTO 0)
     ); 
@@ -31,19 +31,23 @@ ARCHITECTURE Behavioral OF pong IS
     SIGNAL display : std_logic_vector (15 DOWNTO 0); -- value to be displayed
     SIGNAL led_mpx : STD_LOGIC_VECTOR (2 DOWNTO 0); -- 7-seg multiplexing clock
     SIGNAL cnt : std_logic_vector(20 DOWNTO 0); -- counter to generate timing signals
+    -- counter signals
+    SIGNAL current_time : std_logic_vector (15 DOWNTO 0);
 
     COMPONENT bat_n_ball IS
         PORT (
             v_sync : IN STD_LOGIC;
+            clk : IN STD_LOGIC;
             pixel_row : IN STD_LOGIC_VECTOR(10 DOWNTO 0);
             pixel_col : IN STD_LOGIC_VECTOR(10 DOWNTO 0);
             ball_x : IN STD_LOGIC_VECTOR (10 DOWNTO 0);
             serve : IN STD_LOGIC;
-            SW : IN STD_LOGIC_VECTOR (4 DOWNTO 0);-- FIXME: output from switches needs to be acknowledged from bat_n_ball
+            SW : IN STD_LOGIC_VECTOR (3 DOWNTO 0);
             red : OUT STD_LOGIC;
             green : OUT STD_LOGIC;
             blue : OUT STD_LOGIC;
-            hits : OUT STD_LOGIC_VECTOR (15 DOWNTO 0)
+            hits : OUT STD_LOGIC_VECTOR (15 DOWNTO 0);
+            current_time : OUT STD_LOGIC_VECTOR (15 DOWNTO 0);
         );
     END COMPONENT;
     COMPONENT vga_sync IS
@@ -70,12 +74,11 @@ ARCHITECTURE Behavioral OF pong IS
     COMPONENT leddec16 IS
         PORT (
             dig : IN STD_LOGIC_VECTOR (2 DOWNTO 0);
-            data : IN STD_LOGIC_VECTOR (15 DOWNTO 0);
+            data : in std_logic_vector (15 downto 0);
             anode : OUT STD_LOGIC_VECTOR (7 DOWNTO 0);
             seg : OUT STD_LOGIC_VECTOR (6 DOWNTO 0)
         );
     END COMPONENT; 
-    
 BEGIN
     pos : PROCESS (clk_in) is
     BEGIN
@@ -83,16 +86,18 @@ BEGIN
             count <= count + 1;
             -- only move ball left or right with the botton; limit range to 100-700 instead of full 0-800
             IF (btnl = '1' and count = 0 and ball_x_pos > 100) THEN
-                ball_x_pos <= ball_x_pos - 10;
+                ball_x_pos <= ball_x_pos - 18;
             ELSIF (btnr = '1' and count = 0 and ball_x_pos < 700) THEN
-                ball_x_pos <= ball_x_pos + 10;
+                ball_x_pos <= ball_x_pos + 18;
             END IF;
         end if;
     END PROCESS;
-    led_mpx <= cnt(19 DOWNTO 17); -- 7-seg multiplexing clock    
+    led_mpx <= count(19 DOWNTO 17); -- multiplexing clock 
+
     add_bb : bat_n_ball
     PORT MAP(--instantiate bat and ball component
         v_sync => S_vsync, 
+        clk => clk_in,
         pixel_row => S_pixel_row, 
         pixel_col => S_pixel_col, 
         ball_x => ball_x_pos, 
@@ -101,11 +106,12 @@ BEGIN
         red => S_red, 
         green => S_green, 
         blue => S_blue,
-        hits => display
+        hits => display,
+        current_time => current_time
     );
     
     vga_driver : vga_sync
-    PORT MAP(--instantiate vga_sync component
+    PORT MAP( --instantiate vga_sync component
         pixel_clk => pxl_clk, 
         red_in => S_red & "000", 
         green_in => S_green & "000", 
@@ -128,9 +134,9 @@ BEGIN
 
     led1 : leddec16
     PORT MAP(
-      dig => led_mpx, 
-      data => display, 
-      anode => SEG7_anode, 
-      seg => SEG7_seg
+        dig => led_mpx, 
+        data => current_time,
+        anode => SEG7_anode, 
+        seg => SEG7_seg
     );
 END Behavioral;
