@@ -34,9 +34,9 @@ ARCHITECTURE Behavioral OF bat_n_ball IS
     SIGNAL bat_x2 : STD_LOGIC_VECTOR(10 DOWNTO 0) := CONV_STD_LOGIC_VECTOR(800, 11); -- start on far right of screen
 
     -- distance ball moves each frame
-    SIGNAL ball_speed : STD_LOGIC_VECTOR (10 DOWNTO 0) := CONV_STD_LOGIC_VECTOR (initial_ball_speed, 11); 
+    SIGNAL ball_speed : STD_LOGIC_VECTOR (10 DOWNTO 0) := CONV_STD_LOGIC_VECTOR(initial_ball_speed, 11); 
     -- distance bat moves each frame
-    SIGNAL bat_speed : STD_LOGIC_VECTOR (10 DOWNTO 0) := CONV_STD_LOGIC_VECTOR (initial_bat_speed, 11); -- starts at 10 and increases by 4 every 10 seconds
+    SIGNAL bat_speed : STD_LOGIC_VECTOR (10 DOWNTO 0) := CONV_STD_LOGIC_VECTOR(initial_bat_speed, 11); -- starts at 10 and increases by 4 every 10 seconds
     
     SIGNAL ball_on : STD_LOGIC; -- indicates whether ball is at current pixel position
     SIGNAL bat_on : STD_LOGIC; -- indicates whether bat at over current pixel position
@@ -210,7 +210,7 @@ BEGIN
         IF (SW(0) = '1' OR SW(1) = '1' OR SW(2) = '1' OR SW(3) = '1') THEN
             -- map each switch to be a different level of difficulty with sw[0] being easiest and sw[3] being hardest by updating ball gravity (speed)
             if SW(0) = '1' then
-                ball_speed <= CONV_STD_LOGIC_VECTOR (12, 11)
+                ball_speed <= CONV_STD_LOGIC_VECTOR (12, 11);
             elsif SW(1) = '1' then
                 ball_speed <= CONV_STD_LOGIC_VECTOR (initial_bat_speed, 11);
             elsif SW(2) = '1' then 
@@ -243,7 +243,7 @@ BEGIN
             seconds_hun <= (others => '0');
             seconds_tho <= (others => '0');
 
-            bat_speed <= CONV_STD_LOGIC_VECTOR (initial_bat_speed, 11); -- rest bat speed
+            bat_speed <= CONV_STD_LOGIC_VECTOR(initial_bat_speed, 11); -- rest bat speed
             timer_on <= '1'; -- turn timer back on
         ELSIF ball_y <= last_contact_y - jump_height THEN -- bounce off top wall (in our case it bounces once it reaches peak height which is 250px above last contact point)
             ball_y_motion <= ball_speed; -- set vspeed to (+ ball_speed) pixels
@@ -297,7 +297,7 @@ BEGIN
         -- may need to include an actual counter variable to make it more random actually change
         -- not including bat_x bc it only ever resets once ball_x is at 800 (i think that's how it works?)
         if game_on = '1' then -- only apply randomness to the platforms' y-pos when the game is active; sometimes causes issue where a bat spawns at upper-right of screen
-            rand := (conv_integer(counter_reg XOR pixel_row XOR pixel_col XOR ball_y XOR ball_x XOR hit_counter(10 downto 0) XOR rand_clock) mod 250) + 325; -- random number between 325 and 575
+            rand := (conv_integer(counter_reg(10 downto 0) XOR pixel_row XOR pixel_col XOR ball_y XOR ball_x XOR hit_counter(10 downto 0) XOR rand_clock) mod 250) + 325; -- random number between 325 and 575
             rand_platform_y <= conv_std_logic_vector(rand, 11);
         end if;
     END PROCESS;
