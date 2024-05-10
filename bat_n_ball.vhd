@@ -283,7 +283,6 @@ BEGIN
         END IF;
     END PROCESS;
     
-    -- TODO: FIX this randomizer
     randomizer: PROCESS IS
         VARIABLE rand : INTEGER;      
         BEGIN

@@ -15,15 +15,64 @@ Authors: Erik Bobinski, Rumi Loghmani, Shawn Aviles
     2. A Display, and a VGA cable (or VGA adapter if needed)
     3. Computer with Vivado program, and a micro-USB cable to connect the FPGA to your computer
 
-## High-Level System Diagram
+## File Descriptors
 
-*insert a high-level block diagram here of the components in our program to show how it generally works, any drawing program could do this*
+ **_bat_n_ball.vhd_** module is what draws the bats/platforms and the ball, and dictates all of their movements. 
+  * Sets the color of the background to black, and the bats to red
+  * The *platformdraw* process draws the three different bats if the current pixel row and column overlaps the position of each bat<br>
+  * The *mplatform* sets the inital values of each platform and moves them. We set the intial value for y as a pseudo-random number; The x-values of each platform are offset from one another as well.
 
-*description of said diagram*
+ **_leddec16.vhd_** is the module that controls what is on the seven segment display. We pass in time information, which are 4 sets of 4 bits that contain the value of each tens place for the timer, in seconds, which we use as the score of the game
+
+ **_pong_2.vhd_* is the top-level module 
+
+
+
+* The *
 
 ## Steps Required to Run Program in Vivado
 
- *create a list of steps here*
+ ### 1. Create a new RTL project _pong_ in Vivado Quick Start
+
+* Create six new source files of file type VHDL called **_clk_wiz_0_**, **_clk_wiz_0_clk_wiz_**, **_vga_sync_**, **_bat_n_ball_**, **_leddec16_**, and **_pong_2_**
+
+  * clk_wiz_0.vhd and clk_wiz_0_clk_wiz.vhd is similar to Lab 3
+ 
+  * leddec16.vhd is similar to lab 4
+  
+  * vga_sync.vhd, bat_n_ball.vhd, adc_if.vhd, and pong.vhd are similar to Lab 6
+
+* Create a new constraint file of file type XDC called **_pong_2**
+
+* Choose Nexys A7-100T board for the project
+
+* Click 'Finish'
+
+* Click design sources and copy the VHDL code from clk_wiz_0, clk_wiz_0_clk_wiz, vga_sync.vhd, bat_n_ball.vhd, adc_if.vhd, pong.vhd (or pong_2.vhd)
+
+* Click constraints and copy the code from pong.xdc (or pong_2.xdc)
+
+* As an alternative, you can instead download files from Github and import them into your project when creating the project. The source file or files would still be imported during the Source step, and the constraint file or files would still be imported during the Constraints step.
+
+### 2. Run synthesis
+
+### 3. Run implementation
+
+### 3b. (optional, generally not recommended as it is difficult to extract information from and can cause Vivado shutdown) Open implemented design
+
+### 4. Generate bitstream, open hardware manager, and program device
+
+* Click 'Generate Bitstream'
+
+* Click 'Open Hardware Manager' and click 'Open Target' then 'Auto Connect'
+
+* Click 'Program Device' then xc7a100t_0 to download pong.bit to the Nexys A7-100T board
+
+* NOW IT'S TIME TO GAME
+* ![image](https://github.com/erik-bobinski/CPE487_finalProject/assets/102829545/0fb6dc7b-2105-44d5-924f-b70e6691af50)
+
+
+* Push BTNC to start the bouncing ball and use BTNR and BTNL in order to move left and right, be sure to try and avoid the ground while using the incoming platforms to stay alive!
 
 ## Inputs and Outputs to the Nexys Board
 
@@ -32,6 +81,12 @@ Authors: Erik Bobinski, Rumi Loghmani, Shawn Aviles
 
 
 ## Project Creation
+
+Using Lab 6 as our base program, all we had to work with initially was a ball and one bat, so the first thing we did was introduce two more bats. All bats share the same width *bat_w*, speed *bat_speed*, as well as three different flags, *bat_on*, *bat_on1*, *bat_on2*, which indicate where to draw each bat. 
+![image](https://github.com/erik-bobinski/CPE487_finalProject/assets/123090127/335c2463-3bd9-4bf3-94b0-2349377abf8f)
+
+Next, 
+
 
 *Talk about how we created our project by modifying Lab 6; mention all modifications such as signals, processes, etc.*
 *Including images of each step we talk about would be best, Yett emphasized having images throughout the readme*
