@@ -59,6 +59,10 @@ Authors: Erik Bobinski, Rumi Loghmani, Shawn Aviles
 
 * Click 'Program Device' then xc7a100t_0 to download pong.bit to the Nexys A7-100T board
 
+* NOW IT'S TIME TO GAME
+* ![image](https://github.com/erik-bobinski/CPE487_finalProject/assets/102829545/0fb6dc7b-2105-44d5-924f-b70e6691af50)
+
+
 * Push BTNC to start the bouncing ball and use BTNR and BTNL in order to move left and right, be sure to try and avoid the ground while using the incoming platforms to stay alive!
 
 ## Inputs and Outputs to the Nexys Board
