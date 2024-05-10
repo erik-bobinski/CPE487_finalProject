@@ -15,11 +15,20 @@ Authors: Erik Bobinski, Rumi Loghmani, Shawn Aviles
     2. A Display, and a VGA cable (or VGA adapter if needed)
     3. Computer with Vivado program, and a micro-USB cable to connect the FPGA to your computer
 
-## High-Level System Diagram
+## File Descriptors
 
-*insert a high-level block diagram here of the components in our program to show how it generally works, any drawing program could do this*
+ **_bat_n_ball.vhd_** module is what draws the bats/platforms and the ball, and dictates all of their movements. 
+  * Sets the color of the background to black, and the bats to red
+  * The *platformdraw* process draws the three different bats if the current pixel row and column overlaps the position of each bat<br>
+  * The *mplatform* sets the inital values of each platform and moves them. We set the intial value for y as a pseudo-random number; The x-values of each platform are offset from one another as well.
 
-*description of said diagram*
+ **_leddec16.vhd_** is the module that controls what is on the seven segment display. We pass in time information, which are 4 sets of 4 bits that contain the value of each tens place for the timer, in seconds, which we use as the score of the game
+
+ **_pong_2.vhd_* is the top-level module 
+
+
+
+* The *
 
 ## Steps Required to Run Program in Vivado
 
@@ -72,6 +81,12 @@ Authors: Erik Bobinski, Rumi Loghmani, Shawn Aviles
 
 
 ## Project Creation
+
+Using Lab 6 as our base program, all we had to work with initially was a ball and one bat, so the first thing we did was introduce two more bats. All bats share the same width *bat_w*, speed *bat_speed*, as well as three different flags, *bat_on*, *bat_on1*, *bat_on2*, which indicate where to draw each bat. 
+![image](https://github.com/erik-bobinski/CPE487_finalProject/assets/123090127/335c2463-3bd9-4bf3-94b0-2349377abf8f)
+
+Next, 
+
 
 *Talk about how we created our project by modifying Lab 6; mention all modifications such as signals, processes, etc.*
 *Including images of each step we talk about would be best, Yett emphasized having images throughout the readme*
