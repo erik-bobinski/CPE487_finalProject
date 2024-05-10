@@ -22,7 +22,7 @@ ENTITY bat_n_ball IS
 END bat_n_ball;
 
 ARCHITECTURE Behavioral OF bat_n_ball IS
-    CONSTANT bsize : INTEGER := 8; -- ball size in pixels
+    CONSTANT bsize : INTEGER := 10; -- ball size in pixels
     CONSTANT jump_height : INTEGER := 275; -- height of ball jump in pixels
     CONSTANT initial_bat_speed : INTEGER := 10; -- initial bat speed in pixels
     CONSTANT initial_ball_speed : INTEGER := 18; -- initial ball speed in pixels
@@ -72,6 +72,12 @@ ARCHITECTURE Behavioral OF bat_n_ball IS
     signal seconds_ten : std_logic_vector(3 downto 0) := (others => '0');
     signal seconds_hun : std_logic_vector(3 downto 0) := (others => '0');
     signal seconds_tho : std_logic_vector(3 downto 0) := (others => '0');
+
+    -- gravity
+    signal slowdown_distance : integer := 50; -- distance over which to slow down
+    signal slowdown_speed : integer; -- speed during slowdown
+    signal slowdown_start : integer; -- y-coordinate at start of slowdown
+    signal slowdown_end : integer; -- y-coordinate at end of slowdown
 
 BEGIN
     red <= bat_on OR bat_on1 OR bat_on2; -- color setup for red ball and cyan bat on white background
@@ -131,6 +137,7 @@ BEGIN
             ball_on <= '0';
         END IF;
     END PROCESS;
+
     -- process to draw bat
     -- set bat_on if current pixel address is covered by bat position
     platformdraw : PROCESS (bat_x, bat_x1, bat_x2, pixel_row, pixel_col) IS
@@ -227,7 +234,19 @@ BEGIN
         AND ball_speed(3) = '0')  THEN   
             ball_speed <= CONV_STD_LOGIC_VECTOR (initial_bat_speed, 11);
         END IF;
-        
+
+        slowdown_speed <= ball_speed / 2;
+        slowdown_start <= last_contact_y - jump_height + slowdown_distance;
+        slowdown_end <= slowdown_start + slowdown_distance;
+
+        if ball_y <= slowdown_start AND ball_y >= slowdown_end THEN -- within slowdown distance of top
+            ball_y_motion <= CONV_STD_LOGIC_VECTOR(slowdown_speed, 11); -- reduce speed by 1/3
+            checker <= '0';
+        ELSIF ball_y < slowdown_end THEN -- past slowdown distance
+            ball_y_motion <= ball_speed; -- reset to normal speed
+            checker <= '0';
+        end if;
+
         IF serve = '1' AND game_on = '0' THEN -- test for new serve
             -- WHEN GAME RESETS!
             game_on <= '1';
