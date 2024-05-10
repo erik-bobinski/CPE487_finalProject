@@ -80,6 +80,8 @@ Affects the VGA ports, the buttons, the switches used to modulate difficulty via
 
 ## Project Creation
 
+![image](https://github.com/erik-bobinski/CPE487_finalProject/assets/102829545/fc56ca21-fba0-42c1-a73d-31a5425092f5)
+
 Using Lab 6 as our base program, all we had to work with initially was a ball and one bat, so the first thing we did was introduce two more bats. All bats share the same width *bat_w*, speed *bat_speed*, as well as three different flags, *bat_on*, *bat_on1*, *bat_on2*, which indicate where to draw each bat. 
 ![image](https://github.com/erik-bobinski/CPE487_finalProject/assets/123090127/335c2463-3bd9-4bf3-94b0-2349377abf8f)
 
@@ -98,3 +100,19 @@ Below is the final major modification we made, where we track the score of the p
 The program was created based off of the Lab 6 code, so we started with one movable bat and one ball bouncing on it. From there, we needed to implement two additional bats, an incrementing counter each second to track score, pseudo-random bat y location generation.
 
 The counter was the most difficult feature to implement by far. In the base code, the counter was not able to increment each second, and the values were in hexadecimal. We also struggled with a concurrency issue when trying to update the counter at each reset button press. We decided to solve this by updating that value within the process that was changing it.
+
+## Contributions
+
+Erik:
+Worked on the Read.me
+Worked on creating the pseudo-random spawn generation
+<br>
+Shawn:
+the Counter implementation
+multiple platform generation
+updating top level ports
+<br>
+Rumi:
+mapping buttons to functionality
+speed alterations
+<br>
