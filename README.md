@@ -23,7 +23,43 @@ Authors: Erik Bobinski, Rumi Loghmani, Shawn Aviles
 
 ## Steps Required to Run Program in Vivado
 
- *create a list of steps here*
+ ### 1. Create a new RTL project _pong_ in Vivado Quick Start
+
+* Create six new source files of file type VHDL called **_clk_wiz_0_**, **_clk_wiz_0_clk_wiz_**, **_vga_sync_**, **_bat_n_ball_**, **_leddec16_**, and **_pong_2_**
+
+  * clk_wiz_0.vhd and clk_wiz_0_clk_wiz.vhd is similar to Lab 3
+ 
+  * leddec16.vhd is similar to lab 4
+  
+  * vga_sync.vhd, bat_n_ball.vhd, adc_if.vhd, and pong.vhd are similar to Lab 6
+
+* Create a new constraint file of file type XDC called **_pong_2**
+
+* Choose Nexys A7-100T board for the project
+
+* Click 'Finish'
+
+* Click design sources and copy the VHDL code from clk_wiz_0, clk_wiz_0_clk_wiz, vga_sync.vhd, bat_n_ball.vhd, adc_if.vhd, pong.vhd (or pong_2.vhd)
+
+* Click constraints and copy the code from pong.xdc (or pong_2.xdc)
+
+* As an alternative, you can instead download files from Github and import them into your project when creating the project. The source file or files would still be imported during the Source step, and the constraint file or files would still be imported during the Constraints step.
+
+### 2. Run synthesis
+
+### 3. Run implementation
+
+### 3b. (optional, generally not recommended as it is difficult to extract information from and can cause Vivado shutdown) Open implemented design
+
+### 4. Generate bitstream, open hardware manager, and program device
+
+* Click 'Generate Bitstream'
+
+* Click 'Open Hardware Manager' and click 'Open Target' then 'Auto Connect'
+
+* Click 'Program Device' then xc7a100t_0 to download pong.bit to the Nexys A7-100T board
+
+* Push BTNC to start the bouncing ball and use BTNR and BTNL in order to move left and right, be sure to try and avoid the ground while using the incoming platforms to stay alive!
 
 ## Inputs and Outputs to the Nexys Board
 
