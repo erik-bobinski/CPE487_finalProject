@@ -1,5 +1,5 @@
 
-# Lateral Leap (README WORK IN PROGRESS)
+# Lateral Leap
 
 Authors: Erik Bobinski, Rumi Loghmani, Shawn Aviles
 
