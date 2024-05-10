@@ -93,5 +93,8 @@ Below is the final major modification we made, where we track the score of the p
 ![image](https://github.com/erik-bobinski/CPE487_finalProject/assets/123090127/18a856b1-6573-4ac8-a7b3-673556ad7044)
 
 
-## Summary
+## Difficulties and Conclusion
 
+The program was created based off of the Lab 6 code, so we started with one movable bat and one ball bouncing on it. From there, we needed to implement two additional bats, an incrementing counter each second to track score, pseudo-random bat y location generation.
+
+The counter was the most difficult feature to implement by far. In the base code, the counter was not able to increment each second, and the values were in hexadecimal.
