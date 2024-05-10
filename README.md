@@ -9,7 +9,7 @@ Authors: Erik Bobinski, Rumi Loghmani, Shawn Aviles
 ![IMG_3586](https://github.com/erik-bobinski/CPE487_finalProject/assets/123090127/5501a6f9-430f-40ba-8ee8-3706e47d8123)
 
 
-- The game consists of three platforms that spawn on the right side of the screen, move to the left side of the screen, then respawn on the right side in a loop. Each time the platforms appear on the right side of the screen, it will respawn with a pseudo-random vertical position. Your objective is to control the lateral movement of the ball as you bounce on these moving platforms to survive as long as possible. You lose the game if the ball falls to the bottom of the screen. A counter of how many bounces you make are stored on the counter of your FPGA.
+- The game consists of three platforms that spawn on the right side of the screen, move to the left side of the screen, then respawn on the right side in a loop. Each time the platforms appear on the right side of the screen, it will respawn with a pseudo-random vertical position. Your objective is to control the lateral movement of the ball as you bounce on these moving platforms to survive as long as possible. You lose the game if the ball falls to the bottom of the screen. A score of how long you survived (in seconds) is stored on the counter of your FPGA.
 
 -  In order to run this game you will need:
     1. Nexys FPGA
