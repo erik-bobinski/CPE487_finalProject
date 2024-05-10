@@ -24,14 +24,14 @@ END bat_n_ball;
 ARCHITECTURE Behavioral OF bat_n_ball IS
     CONSTANT bsize : INTEGER := 8; -- ball size in pixels
     CONSTANT jump_height : INTEGER := 275; -- height of ball jump in pixels
-    CONSTANT initial_bat_speed : INTEGER := 10; -- initial bat speed in pixels
-    CONSTANT initial_ball_speed : INTEGER := 18; -- initial ball speed in pixels
+    CONSTANT initial_bat_speed : INTEGER := 12; -- initial bat speed in pixels
+    CONSTANT initial_ball_speed : INTEGER := 14; -- initial ball speed in pixels
     CONSTANT bat_h : INTEGER := 10; -- bat height in pixels
-    SIGNAL bat_w : INTEGER := 50; -- bat width in pixels
+    SIGNAL bat_w : INTEGER := 70; -- bat width in pixels
 
-    SIGNAL bat_x : STD_LOGIC_VECTOR(10 DOWNTO 0) := CONV_STD_LOGIC_VECTOR(850, 11); -- start on far right of screen offest from others
-    SIGNAL bat_x1 : STD_LOGIC_VECTOR(10 DOWNTO 0) := CONV_STD_LOGIC_VECTOR(900, 11); -- start on far right of screen offest from others
-    SIGNAL bat_x2 : STD_LOGIC_VECTOR(10 DOWNTO 0) := CONV_STD_LOGIC_VECTOR(800, 11); -- start on far right of screen offset from others
+    SIGNAL bat_x : STD_LOGIC_VECTOR(10 DOWNTO 0) := CONV_STD_LOGIC_VECTOR(790, 11); -- start on far right of screen offest from others
+    SIGNAL bat_x1 : STD_LOGIC_VECTOR(10 DOWNTO 0) := CONV_STD_LOGIC_VECTOR(820, 11); -- start on far right of screen offest from others
+    SIGNAL bat_x2 : STD_LOGIC_VECTOR(10 DOWNTO 0) := CONV_STD_LOGIC_VECTOR(860, 11); -- start on far right of screen offset from others
 
     -- distance ball moves each frame
     SIGNAL ball_speed : STD_LOGIC_VECTOR (10 DOWNTO 0) := CONV_STD_LOGIC_VECTOR(initial_ball_speed, 11); 
@@ -68,10 +68,10 @@ ARCHITECTURE Behavioral OF bat_n_ball IS
     -- timer for game
     signal timer_on : std_logic;
     signal counter_reg : std_logic_vector(29 downto 0);
-    signal seconds_one : std_logic_vector(3 downto 0) := (others => '0');
-    signal seconds_ten : std_logic_vector(3 downto 0) := (others => '0');
-    signal seconds_hun : std_logic_vector(3 downto 0) := (others => '0');
-    signal seconds_tho : std_logic_vector(3 downto 0) := (others => '0');
+    signal seconds_one : std_logic_vector(3 downto 0);
+    signal seconds_ten : std_logic_vector(3 downto 0);
+    signal seconds_hun : std_logic_vector(3 downto 0);
+    signal seconds_tho : std_logic_vector(3 downto 0);
 
 BEGIN
     red <= bat_on OR bat_on1 OR bat_on2; -- color setup for red ball and cyan bat on white background
@@ -81,7 +81,14 @@ BEGIN
     counter : process (clk)
     begin
         if rising_edge(clk) then
-            if timer_on = '1' then
+            if serve = '1' AND game_on = '0' then
+                counter_reg <= (others => '0');
+                seconds_one <= (others => '0');
+                seconds_ten <= (others => '0');
+                seconds_hun <= (others => '0');
+                seconds_tho <= (others => '0');
+            end if;
+            if game_on = '1' then
                 if conv_integer(counter_reg) = 99999999 then
                     counter_reg <= (others => '0');
                     seconds_one <= seconds_one + "0001";  -- Increment seconds directly
@@ -90,7 +97,7 @@ BEGIN
                         seconds_ten <= seconds_ten + "0001";
                         -- increase bat speed by 4  speed every 10 seconds, caps at 40
                         if bat_speed < 40 then
-                            bat_speed <= bat_speed + 4;
+                            bat_speed <= bat_speed + 8;
                         end if;
                         if seconds_ten = "1001" then
                             seconds_ten <= (others => '0');
@@ -105,9 +112,13 @@ BEGIN
                     counter_reg <= counter_reg + 1;
                 end if;
                 -- Update to represent current time, display will show it
-                current_time <= seconds_tho & seconds_hun & seconds_ten & seconds_one;
+                current_time(15 downto 12) <= seconds_tho; 
+                current_time(11 downto 8) <= seconds_hun;
+                current_time(7 downto 4) <= seconds_ten;
+                current_time(3 downto 0) <= seconds_one;
             end if;
         end if;
+        
     end process;
 
     -- process to draw round ball
@@ -171,8 +182,8 @@ BEGIN
     BEGIN
         WAIT UNTIL rising_edge(v_sync);
         -- process to move bat from left to right side of screen
-        if game_on = '0' OR bat_x < 0 THEN
-            bat_x <= CONV_STD_LOGIC_VECTOR(800, 11);
+        if game_on = '0' OR bat_x < 25 THEN
+            bat_x <= CONV_STD_LOGIC_VECTOR(810, 11);
             bat_y <= conv_std_logic_vector((conv_integer(rand_platform_y)*7)mod 250 + 325,11);
         ELSE
             bat_x <= bat_x - bat_motion;
@@ -182,8 +193,8 @@ BEGIN
     mplatform1 : PROCESS
     BEGIN
         WAIT UNTIL rising_edge(v_sync);
-        if game_on = '0' OR bat_x1 < 0 THEN
-            bat_x1 <= CONV_STD_LOGIC_VECTOR(850, 11);
+        if game_on = '0' OR bat_x1 < 25 THEN
+            bat_x1 <= CONV_STD_LOGIC_VECTOR(790, 11);
             bat_y1 <= conv_std_logic_vector((conv_integer(rand_platform_y)*41)mod 250 + 325,11);
         ELSE
             bat_x1 <= bat_x1 - bat_motion;
@@ -193,8 +204,8 @@ BEGIN
     mplatform2 : PROCESS
     BEGIN
         WAIT UNTIL rising_edge(v_sync);
-        if game_on = '0' OR bat_x2 < 0 THEN
-            bat_x2 <= CONV_STD_LOGIC_VECTOR(940, 11);
+        if game_on = '0' OR bat_x2 < 25 THEN
+            bat_x2 <= CONV_STD_LOGIC_VECTOR(860, 11);
             bat_y2 <= conv_std_logic_vector((conv_integer(rand_platform_y)*29)mod 250 + 325,11);
         ELSE
             bat_x2 <= bat_x2 - bat_motion;
@@ -210,13 +221,13 @@ BEGIN
         IF (SW(0) = '1' OR SW(1) = '1' OR SW(2) = '1' OR SW(3) = '1') THEN
             -- map each switch to be a different level of difficulty with sw[0] being easiest and sw[3] being hardest by updating ball gravity (speed)
             if SW(0) = '1' then
-                ball_speed <= CONV_STD_LOGIC_VECTOR (12, 11);
+                ball_speed <= CONV_STD_LOGIC_VECTOR (8, 11);
             elsif SW(1) = '1' then
                 ball_speed <= CONV_STD_LOGIC_VECTOR (initial_bat_speed, 11);
             elsif SW(2) = '1' then 
-                ball_speed <= CONV_STD_LOGIC_VECTOR (22, 11);
+                ball_speed <= CONV_STD_LOGIC_VECTOR (16, 11);
             elsif SW(3) = '1' then
-                ball_speed <= CONV_STD_LOGIC_VECTOR (26, 11);
+                ball_speed <= CONV_STD_LOGIC_VECTOR (20, 11);
             end if;
         END IF;
         
@@ -232,22 +243,8 @@ BEGIN
             -- WHEN GAME RESETS!
             game_on <= '1';
             ball_y_motion <= (NOT ball_speed) + 1; -- set vspeed to (- ball_speed) pixels
-            hit_counter <= "0000000000000001";
-            hits <= hit_counter;
             checker <= '0';
-            -- rest timer
-            counter_reg <= (others => '0');
-            current_time <= (others => '0');
-            seconds_one <= (others => '0');
-            seconds_ten <= (others => '0');
-            seconds_hun <= (others => '0');
-            seconds_tho <= (others => '0');
-            -- reset ball starting position
-            ball_y <= CONV_STD_LOGIC_VECTOR(200, 11);
-            ball_x <= CONV_STD_LOGIC_VECTOR(400, 11);
-
             bat_speed <= CONV_STD_LOGIC_VECTOR(initial_bat_speed, 11); -- rest bat speed
-            timer_on <= '1'; -- turn timer back on
         ELSIF ball_y <= last_contact_y - jump_height THEN -- bounce off top wall (in our case it bounces once it reaches peak height which is 250px above last contact point)
             ball_y_motion <= ball_speed; -- set vspeed to (+ ball_speed) pixels
             checker <= '0';
@@ -256,9 +253,6 @@ BEGIN
             ball_y_motion <= (NOT ball_speed) + 1; -- set vspeed to (- ball_speed) pixels
             checker <= '0';
             game_on <= '0'; -- and make ball disappear.
-            hit_counter <= "0000000000000000";
-            hits <= hit_counter;
-            timer_on <= '0';
         END IF;
         -- allow for bounce off bat, bat1, and bat2
         IF  ((ball_x + bsize/2) >= (bat_x - bat_w) AND
@@ -275,8 +269,6 @@ BEGIN
             (ball_y - bsize/2) <= (bat_y2 + bat_h) AND checker = '0') THEN
                 last_contact_y <= ball_y;
                 checker <= '1';
-                hit_counter <= hit_counter + 1;
-                hits <= hit_counter;
                 ball_y_motion <= (NOT ball_speed) + 1; -- set vspeed to (- ball_speed) pixels
         END IF;
         -- compute next ball vertical position
@@ -284,7 +276,7 @@ BEGIN
         -- when ball_y is close to and zero ball_y_motion is negative
         temp := ('0' & ball_y) + (ball_y_motion(10) & ball_y_motion);
         IF game_on = '0' THEN
-            ball_y <= CONV_STD_LOGIC_VECTOR(250, 11);
+            ball_y <= CONV_STD_LOGIC_VECTOR(200, 11);
         ELSIF temp(11) = '1' THEN
             ball_y <= (OTHERS => '0');
         ELSE ball_y <= temp(10 DOWNTO 0); -- 9 downto 0
@@ -300,7 +292,12 @@ BEGIN
         -- may need to include an actual counter variable to make it more random actually change
         -- not including bat_x bc it only ever resets once ball_x is at 800 (i think that's how it works?)
         if game_on = '1' then -- only apply randomness to the platforms' y-pos when the game is active; sometimes causes issue where a bat spawns at upper-right of screen
-            rand := (conv_integer(counter_reg(10 downto 0) XOR pixel_row XOR pixel_col XOR ball_y XOR ball_x XOR hit_counter(10 downto 0) XOR rand_clock) mod 250) + 325; -- random number between 325 and 575
+            rand := (conv_integer(counter_reg(10 downto 0) XOR pixel_row 
+            XOR pixel_col 
+            XOR ball_y
+            XOR ball_x 
+            XOR hit_counter(10 downto 0) 
+            XOR rand_clock) mod 250) + 325; -- random number between 325 and 575
             rand_platform_y <= conv_std_logic_vector(rand, 11);
         end if;
     END PROCESS;

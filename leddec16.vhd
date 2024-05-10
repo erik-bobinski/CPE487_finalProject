@@ -38,12 +38,12 @@ BEGIN
 					"0001111" when data4 = "0111" else -- 7
 					"0000000" when data4 = "1000" else -- 8
 					"0000100" when data4 = "1001" else -- 9
-					-- "0001000" when data4 = "1010" else -- A
-					-- "1100000" when data4 = "1011" else -- B
-					-- "0110001" when data4 = "1100" else -- C
-					-- "1000010" when data4 = "1101" else -- D
-					-- "0110000" when data4 = "1110" else -- E
-					-- "0111000" when data4 = "1111" else -- F
+					"0001000" when data4 = "1010" else -- A
+					"1100000" when data4 = "1011" else -- B
+					"0110001" when data4 = "1100" else -- C
+					"1000010" when data4 = "1101" else -- D
+					"0110000" when data4 = "1110" else -- E
+					"0111000" when data4 = "1111" else -- F
 					"1111111";
 
 	-- Turn on anode of 7-segment display addressed by 3-bit digit selector dig
@@ -51,10 +51,5 @@ BEGIN
 					"11111101" WHEN (dig = "001" AND data1 /= "0000") OR (dig ="001" AND data1 = "0000" AND data2  /= "0000") OR (dig ="001" AND data1 = "0000" AND data3  /= "0000")  ELSE  -- 1
 					"11111011" WHEN (dig = "010" AND data2 /= "0000") OR (dig = "010" AND data2 = "0000" AND data3 /= "0000")  ELSE -- 2
 					"11110111" WHEN dig = "011" AND data3 /= "0000" ELSE -- 3  
--- not using the remaining (left side) digits on display
---	         "11101111" WHEN dig = "100" ELSE -- 4
---	         "11011111" WHEN dig = "101" ELSE -- 5 
---	         "10111111" WHEN dig = "110" ELSE -- 6
---	         "01111111" WHEN dig = "111" ELSE -- 7
 	        "11111111";
 END Behavioral;

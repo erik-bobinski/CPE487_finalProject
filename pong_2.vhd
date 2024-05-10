@@ -85,9 +85,9 @@ BEGIN
         if rising_edge(clk_in) then
             count <= count + 1;
             -- only move ball left or right with the botton; limit range to 100-700 instead of full 0-800
-            IF (btnl = '1' and count = 0 and ball_x_pos > 100) THEN
+            IF (btnl = '1' and count = 0 and ball_x_pos > 50) THEN
                 ball_x_pos <= ball_x_pos - 18;
-            ELSIF (btnr = '1' and count = 0 and ball_x_pos < 700) THEN
+            ELSIF (btnr = '1' and count = 0 and ball_x_pos < 750) THEN
                 ball_x_pos <= ball_x_pos + 18;
             END IF;
         end if;
