@@ -97,4 +97,4 @@ Below is the final major modification we made, where we track the score of the p
 
 The program was created based off of the Lab 6 code, so we started with one movable bat and one ball bouncing on it. From there, we needed to implement two additional bats, an incrementing counter each second to track score, pseudo-random bat y location generation.
 
-The counter was the most difficult feature to implement by far. In the base code, the counter was not able to increment each second, and the values were in hexadecimal.
+The counter was the most difficult feature to implement by far. In the base code, the counter was not able to increment each second, and the values were in hexadecimal. We also struggled with a concurrency issue when trying to update the counter at each reset button press. We decided to solve this by updating that value within the process that was changing it.
